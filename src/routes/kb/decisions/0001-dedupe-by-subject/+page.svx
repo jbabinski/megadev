@@ -1,0 +1,25 @@
+---
+layout: runbook
+title: '0001 · Duplicates share a subject line'
+owner: rune
+status: accepted
+reviewed: 2024-06-11
+---
+
+**Date:** 11 June 2024 · **Deciders:** Rune (product), support desk
+
+## Context
+
+Reports arrive faster than the desk can read them. During incidents the same problem comes in
+hundreds of times, and engineering asks for one ticket per issue.
+
+## Decision
+
+Two reports are the same issue when their subject lines match after lowercasing and stripping
+punctuation. The desk merges on subject alone; nobody has to read the body.
+
+## Consequences
+
+- Fast: one person can triage an incident morning.
+- Reports with different subjects about the same bug end up in separate tickets. Accepted;
+  engineering merges them later.

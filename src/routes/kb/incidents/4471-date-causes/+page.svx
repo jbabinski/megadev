@@ -1,0 +1,66 @@
+---
+layout: runbook
+title: '#4471 - date cause breakdown and resolution'
+owner: jbabinski
+status: resolved
+reviewed: 2026-10-28
+signature: v1.eyJzdWIiOiI2MzQiLCJhdWQiOiJjaGFsbGVuZ2U6d2hhdC1pdC1zaG93cyIsImlhdCI6MTc5MzE5NTQyNSwiZXhwIjoxNzkzMjgxODI1fQ.EKk928u7R8zWbHRkLi7JjXPuf-F8NX4igK_yEnxqUQA
+---
+
+<script>
+  import CauseTable from '#lib/kb/CauseTable.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+</script>
+
+The desk merged reports with similar date symptoms into one known ticket.
+The original [incident page](/kb/incidents/4471) describes one queued fix,
+but the export's live classification separates the shared parser from the
+booking-v3 form hint. These are different problems, not duplicate tickets.
+
+## Count reports by cause
+
+<CauseTable ticket={4471} issueNumbers={{ parser: 1, hint: 2 }} />
+
+The table deduplicates overlapping export rows by report ID, then uses tenant
+locale, booking form, and channel to classify each report. Intake tags describe
+an initial guess, not an established cause.
+
+- **Parser:** the shared parser reads month first for day-first tenants.
+  See [#1 - day-first parser](https://github.com/jbabinski/megadev-s01e03/issues/1).
+- **Hint:** the booking-v3 form displays `MM/DD/YYYY`, but reads dates in the
+  tenant's day-first order. See [#2 - booking-v3 hint](https://github.com/jbabinski/megadev-s01e03/issues/2).
+
+The table footnotes reports the desk read as one-day moves. The export files
+them under parser by tenant and channel; that classification alone does not
+independently explain every reported symptom.
+
+## Engineering update: closed 5 October
+
+The [course's engineering update](https://hq.mega.dev/challenges/what-it-shows)
+supersedes the queued-fix description in the original export:
+
+- **Parser: fixed.** Engineering reports `fix(dates): parse dd/mm for eu locales`.
+  Ticket [#1](https://github.com/jbabinski/megadev-s01e03/issues/1) is closed as completed.
+- **Hint: won't fix.** The booking-v3 form was retired.
+  Ticket [#2](https://github.com/jbabinski/megadev-s01e03/issues/2) is closed as not planned,
+  not as a delivered hint fix.
+
+<Callout>
+Closed does not always mean fixed. Keep the two causes and their resolutions
+separate; retiring a form is not the same outcome as fixing the parser.
+</Callout>
+
+## Triage after the update
+
+Match reports by cause and affected context, not subject alone. Check the
+tenant locale, form, channel, and current engineering state before merging.
+Deduplicate repeated report IDs before counting. Investigate new reports
+against the parser fix or form retirement instead of assuming they are
+duplicates of this closed incident.
+
+The accepted [decision 0001](/kb/decisions/0001-dedupe-by-subject) is preserved
+as history. Its subject-only rule and the old incident's queued-fix claim
+should not override the computed evidence or the later engineering update.
+
+<RenderStamp {signature} />
